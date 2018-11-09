@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./vue-2.4.0.js"></script>
+    <style>
+    body {
+    background-color: #f0f3ef;
+    cursor: default;
+    color: skyblue;
+}
+
+input {
+    outline: none;
+    appearance: none;
+}
+
+#app {
+    /* border: 1px solid #ccc; */
+    width: 500px;
+    height: 600px;
+    margin: 200 auto;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 100px auto;
+    box-shadow: 0px 0px 10px 1px rgba(45, 89, 141, .2);
+    background-color: #f0f3ef;
+}
+
+.text {
+    width: 380px;
+    margin: 0 auto;
+    outline: none;
+    border: none;
+    /* border: 1px solid skyblue; */
+    padding-left: 10px;
+    background-color: #f0f3ef;
+    color: skyblue;
+}
+
+.text::-webkit-input-placeholder {
+    color: skyblue;
+}
+
+.task_list {
+    text-align: left;
+}
+
+.task_option {
+    display: flex;
+    justify-content: space-around;
+}
+
+.middle_line {
+    text-decoration: line-through;
+}
+
+.line {
+    margin-right: 200px;
+}
+
+.box {
+    margin-bottom: 5px;
+}
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <h3>任务列表</h3>
+        <input v-model="test" @keyup.enter="submit" class="text" type="text" placeholder="请输入任务">
+
+        <div class="box" v-for="(item, index) in msg" :key="item.id">
+            <input @click='ok(index,$event)' type="checkbox">
+            <span class="line">{{item.option}}</span>
+            <input style="color: skyblue" type="button" value="删除" @click.once='del(index,item.option)'>
+        </div>
+
+        <span class="task_list">还剩下{{msg2}}个未完成的任务</span>
+        <div class="task_option">
+            <span @click='AllTask()'>所有任务</span>
+            <span @click='NotFinish()'>未完成的任务</span>
+            <span @click='Finish()'>已完成任务</span>
+            <span @click='DelOption'>删除所有已完成任务</span>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            // flag: false,
+            test: '',
+            msg: [],
+            option: [],
+            msg2: '0',
+            ArrData: [],
+            NumData: -1,
+            localData: [],
+        },
+        methods: {
+            submit: function (e) {
+
+                var line = document.querySelectorAll('.line');
+                var arr = [];
+                for (var i = 0; i < line.length; i++) {
+                    if (!line[i].classList.contains('middle_line')) {
+                        arr.push(line[i]);
+                    }
+                }
+                if (this.test != '') {
+                    for (var i = 0; i < this.msg.length; i++) {
+                        if (this.msg[i].option == this.test) {
+                            alert('有毒吧你,居然想输入相同的任务???');
+                            return;
+                        }
+                    }
+                    this.msg2 = arr.length + 1;
+                    this.NumData++;
+                    if (!this.localData) {
+                        this.ArrData.push({
+                            id: this.NumData,
+                            option: this.test
+                        });
+                    } else {
+                        this.ArrData = this.localData;
+                    }
+
+                    if (e.code == 'Enter') {
+                        this.msg.push({
+                            id: this.msg.length,
+                            option: this.test
+                        });
+                        this.option.push({
+                            id: this.option.length,
+                            option: this.test
+                        });
+                        this.test = '';
+                    }
+                }
+                var json = JSON.stringify(this.ArrData);
+                localStorage.setItem('key', json)
+            },
+            /* 删除 */
+            del: function (index, str) {
+                console.log(index);
+                console.log(str);
+                this.msg.splice(index, 1);
+                this.option.splice(index, 1);
+                var arr = JSON.parse(localStorage.getItem('key'));
+                // return;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i].option == str) {
+                        arr.splice(i, 1);
+                    }
+                }
+                localStorage.setItem("key", JSON.stringify(arr));
+                this.msg2 = JSON.parse(localStorage.getItem('key')).length;
+                // arr.splice(index, 1);
+            },
+            /* 选中逻辑 */
+            ok: function (index, event) {
+                var line = document.querySelectorAll('.line');
+                var arr = [];
+                var arr1 = JSON.parse(localStorage.getItem('key'));
+                for (var i = 0; i < line.length; i++) {
+                    if (!line[i].classList.contains('middle_line')) {
+                        arr.push(line[i]);
+                    }
+                }
+                if (event.target.checked) {
+                    this.msg2 = arr.length - 1;
+                    event.currentTarget.nextElementSibling.classList.add('middle_line');
+
+                    for (var i = 0; i < arr1.length; i++) {
+                        if (arr1[i].option == event.currentTarget.nextElementSibling.innerText) {
+                            arr1.splice(i, 1);
+                        }
+                    }
+                    localStorage.setItem("key", JSON.stringify(arr1));
+                    this.msg2 = JSON.parse(localStorage.getItem('key')).length;
+                } else {
+                    this.msg2 = arr.length + 1;
+                    event.currentTarget.nextElementSibling.classList.remove('middle_line');
+                    arr1 = JSON.parse(localStorage.getItem('key'));
+                    arr1.push({
+                        id: index,
+                        option: event.currentTarget.nextElementSibling.innerText
+                    })
+                    localStorage.setItem("key", JSON.stringify(arr1));
+                    this.msg2 = JSON.parse(localStorage.getItem('key')).length;
+                }
+            },
+            /* 未完成 */
+            NotFinish: function () {
+                var arr = [];
+                var arr1 = [];
+                var box = document.querySelectorAll('.middle_line');
+                var box1 = document.querySelectorAll('.line');
+                for (var i = 0; i < box1.length; i++) {
+                    if (!box1[i].classList.contains('middle_line')) {
+                        box1[i].parentNode.style.display = 'block';
+                        arr.push(box1[i]);
+                        arr1.push(box1[i]);
+                    }
+                }
+                if (box.length > 0) {
+                    for (var i = 0; i < box.length; i++) {
+                        box[i].parentNode.style.display = 'none';
+                    }
+                }
+            },
+            /* 已完成 */
+            Finish: () => {
+                var box = document.querySelectorAll('.middle_line');
+                if (box.length > 0) {
+                    for (var i = 0; i < box.length; i++) {
+                        box[i].parentNode.style.display = 'block';
+                    }
+                };
+                var box1 = document.querySelectorAll('.line');
+                for (var i = 0; i < box1.length; i++) {
+                    if (!box1[i].classList.contains('middle_line')) {
+                        box1[i].parentNode.style.display = 'none';
+
+                    }
+                };
+            },
+            /* 所有任务 */
+            AllTask: function () {
+                var box1 = document.querySelectorAll('.line');
+                if (box1.length > 0) {
+                    for (var i = 0; i < box1.length; i++) {
+                        box1[i].parentNode.style.display = 'block';
+                    }
+                }
+            },
+            /* 删除所有已完成 */
+            DelOption: function () {
+                var box = document.querySelectorAll('.middle_line');
+                if (box.length > 0) {
+                    for (var i = 0; i < box.length; i++) {
+                        box[i].parentNode.parentNode.removeChild(box[i].parentNode);
+                    }
+                }
+            },
+        },
+        created: function () {
+            if (localStorage.getItem('key')) {
+                var json = localStorage.getItem('key');
+                this.localData = JSON.parse(json);
+                this.msg = this.localData;
+                this.msg2 = this.msg.length;
+            }
+        },
+
+    })
+</script>
