@@ -120,13 +120,13 @@ input {
                 if (this.test != '') {
                     for (var i = 0; i < this.msg.length; i++) {
                         if (this.msg[i].option == this.test) {
-                            alert('有毒吧你,居然想输入相同的任务???');
-                            return;
+                            alert('你484傻,居然想输入相同的任务???');
+                            // return;
                         }
                     }
                     this.msg2 = arr.length + 1;
                     this.NumData++;
-                    if (!this.localData) {
+                    if (this.localData.length == 0) {
                         this.ArrData.push({
                             id: this.NumData,
                             option: this.test
