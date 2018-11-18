@@ -1,0 +1,59 @@
+body {
+    background-color: #f0f3ef;
+    cursor: default;
+    color: skyblue;
+}
+
+input {
+    outline: none;
+    appearance: none;
+}
+
+#app {
+    /* border: 1px solid #ccc; */
+    width: 500px;
+    height: 600px;
+    margin: 200 auto;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 100px auto;
+    box-shadow: 0px 0px 10px 1px rgba(45, 89, 141, .2);
+    background-color: #f0f3ef;
+}
+
+.text {
+    width: 380px;
+    margin: 0 auto;
+    outline: none;
+    border: none;
+    /* border: 1px solid skyblue; */
+    padding-left: 10px;
+    background-color: #f0f3ef;
+    color: skyblue;
+}
+
+.text::-webkit-input-placeholder {
+    color: skyblue;
+}
+
+.task_list {
+    text-align: left;
+}
+
+.task_option {
+    display: flex;
+    justify-content: space-around;
+}
+
+.middle_line {
+    text-decoration: line-through;
+}
+
+.line {
+    margin-right: 200px;
+}
+
+.box {
+    margin-bottom: 5px;
+}
